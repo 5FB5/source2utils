@@ -2,7 +2,11 @@
 # MUST run in the models folder
 
 import re, sys, os, io, re
+
+from colorama import init
 from termcolor import colored, cprint
+
+init()
 
 # name of file that stores all paths we need
 FILE_MULTIPLE_CONVERT_NAME = 'paths.txt'
