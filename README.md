@@ -45,7 +45,7 @@ To run, you will need to have all your models in the content folder of your targ
 
 You have two ways to convert your models - automatic and manual mode. If you select automatic mode (a), the program will read all paths you need from the "paths.txt " file that you must create in directory with program, after that converting will begin. 
 ![screenshot_automode_example](https://imgur.com/WG0sHpo.jpg)
-Example of "path.txt" file 
+Example of "paths.txt" file 
 ![screenshot_pathfile_example](https://imgur.com/dKucEjk.jpg)
 
 In manual mode (m) , you can enter specific path individually an unlimited number of times.
