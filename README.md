@@ -25,7 +25,7 @@ Below is a list of branches that DON'T work with this tool (with the HL:A Bootle
 
 3. Download and set up the [Half-Life Alyx Bootleg Tools](https://github.com/thenayr/Half-Life-Alyx-SDK)
 
-4. Run the scripts as instructed below.
+4. Run the scripts or .exe program as instructed below.
 
 ## vmt_to_vmat.py
 
