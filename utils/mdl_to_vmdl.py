@@ -61,6 +61,7 @@ def get_mesh_name(file):
 def convert_multiple_valid_path_check():
     buff_paths = []
     paths_filtered = []
+    path_index = ''
 
     with io.open(FILE_MULTIPLE_CONVERT_NAME, encoding='utf-8') as file_src:
         # open file and read all in buffer
@@ -68,21 +69,22 @@ def convert_multiple_valid_path_check():
         
     for i in buff_paths:
         # check valid paths
-        path_index = re.findall('^[a-zA-Z]:[\\\S|*\S]?.*$', i) 
+        path_index = re.findall(r'^[a-zA-Z]:[\\\S|*\S]?.*$', i) 
         
         if (bool(path_index) != False):
             for j in path_index:
                 # right paths we write in filtered list
                 if (os.path.exists(j)):
                     paths_filtered.append(j)
-
-    return(paths_filtered)
-    pass
-
-def convert_multiple_generate_files(paths_array):
-    _paths = paths_array
     
+    return(paths_filtered)
+pass
+
+def convert_multiple_generate_vmdl(paths_array):
+    _paths = paths_array
+
     for i in _paths:
+        files = []
         PATH_TO_CONTENT_ROOT = i
         
         abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
@@ -94,8 +96,8 @@ def convert_multiple_generate_files(paths_array):
                     #    if abspath.lower().endswith(INPUT_FILE_EXT):
                     #        files.append(abspath)
             for filename in files:
+                # replacing format name
                 out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
-                #if os.path.exists(out_name): continue
 
                 print('Importing', os.path.basename(filename))
 
@@ -106,10 +108,12 @@ def convert_multiple_generate_files(paths_array):
     
                 with open(out_name, 'w') as out:
                     putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
+
+        print(colored('Converting "' + i + '" was successful!', 'green'))
     
     pass
 
-def convert_multiple_main(): #TODO: read paths from file func
+def convert_multiple_main():
     paths = []
 
     # if file exists
@@ -120,10 +124,10 @@ def convert_multiple_main(): #TODO: read paths from file func
             #print all valid paths
             print("\nValid paths:")
             for i in paths:
-                print(i)
-            print('--------------------------------------------------------------------------------------------------------\n')
+                print(colored('+ ' + i, 'green'))
+            print('--------------------------------------------------------------------------------------------------------')
             
-            convert_multiple_generate_files(paths)
+            convert_multiple_generate_vmdl(paths)
         
         else:
             invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\', 'green')
@@ -142,12 +146,12 @@ def convert_once_main():
         PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? Valid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ").lower()
     
         if (not os.path.exists(PATH_TO_CONTENT_ROOT)):
-            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example:', 'red') + colored(' C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ ', 'green')
+            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example:', 'red') + colored(' C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \n', 'green')
             print(textInvalid)
         else:
             # recursively search all dirs and files
             abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
-            print(abspath)
+            print('\nConverting "' + abspath + '"')
     
             if os.path.isdir(abspath):
                 files.extend(walk_dir(abspath))
@@ -169,13 +173,15 @@ def convert_once_main():
                 with open(out_name, 'w') as out:
                     putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
         
+            print(colored('\nConverting "' + abspath + '" was successful!', 'green'))
+        
         finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
   
     pass
 
 print('\nSource 2 VMDL Generator! By Rectus via Github.')
 print("Initially forked by Alpine, based on caseytube's fork, this version by 5FB5.")
-print("Version: 1.1")
+print("Version: 1.1.1")
 print('--------------------------------------------------------------------------------------------------------')
 print('Reminder to put your models in the same directory structure as Source 1, starting with models!\n')
 
@@ -193,7 +199,7 @@ else:
 # Main function
 while (True):
 
-    startupMsg = input('\nDo you want to convert multiple files automatically ("a") or specific one manually ("m") or quit ("q")? a/m/q: ')
+    startupMsg = input('\nDo you want to convert multiple files automatically ("a") or specific one manually ("m") or quit ("q")? \na/m/q: ')
 
     if (startupMsg == 'a'):
         convert_multiple_main()
