@@ -82,6 +82,4 @@ Python 3.7 or later
 
 [Python Image Library (PIL)  5.4.1](https://pillow.readthedocs.io/en/5.1.x/installation.html)
 
-[The Half-Life Alyx Bootleg Tools](https://github.com/thenayr/Half-Life-Alyx-SDK)
-
 A Source 1 game's content, with the .vtfs extracted to .tgas in the same file structure as the .vmts
