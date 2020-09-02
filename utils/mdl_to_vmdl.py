@@ -142,6 +142,7 @@ def convert_multiple_main():
     pass
 
 def convert_once_main():
+    files = []
     finalCommand = ''
 
     while (not finalCommand == 'n'):
@@ -158,18 +159,20 @@ def convert_once_main():
             if os.path.isdir(abspath):
                 files.extend(walk_dir(abspath))
 
-            for filename in files:
-                out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
+            for i in tqdm(range(len(files))):
 
-                print('\tImporting', colored(os.path.basename(filename), 'yellow'))
+                for filename in files:
+                    out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
 
-                out = sys.stdout
+                    #print('\tImporting', colored(os.path.basename(filename), 'yellow'))
 
-                sourcePath = "models" + filename.split("models", 1)[1] # HACK?
-                mdl_path = fix_path(sourcePath)
+                    out = sys.stdout
+
+                    sourcePath = "models" + filename.split("models", 1)[1] # HACK?
+                    mdl_path = fix_path(sourcePath)
     
-                with open(out_name, 'w') as out:
-                    putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
+                    with open(out_name, 'w') as out:
+                        putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
         
             print(colored('\tConverting completed!', 'green'))
         
