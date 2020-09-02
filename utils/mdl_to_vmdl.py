@@ -142,7 +142,6 @@ def convert_multiple_main():
     pass
 
 def convert_once_main():
-    files = []
     finalCommand = ''
 
     while (not finalCommand == 'n'):
