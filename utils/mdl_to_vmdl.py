@@ -3,6 +3,7 @@
 
 import re, sys, os, io, re
 
+from tqdm import tqdm
 from colorama import init
 from termcolor import colored, cprint
 
@@ -58,7 +59,7 @@ def relative_path(s, base):
 def get_mesh_name(file):
     return os.path.splitext(os.path.basename(fix_path(file)))[0]
 
-def convert_multiple_valid_path_check():
+def convert_multiple_get_valid_paths():
     buff_paths = []
     paths_filtered = []
     path_index = ''
@@ -78,38 +79,39 @@ def convert_multiple_valid_path_check():
                     paths_filtered.append(j)
     
     return(paths_filtered)
-pass
+
 
 def convert_multiple_generate_vmdl(paths_array):
     _paths = paths_array
 
     for i in _paths:
         files = []
+        
         PATH_TO_CONTENT_ROOT = i
         
         abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
         print('\nConverting "' + abspath + '"')
+        
+        for j in tqdm(range(len(_paths))):
     
-        if os.path.isdir(abspath):
-            files.extend(walk_dir(abspath))
-                    #else:
-                    #    if abspath.lower().endswith(INPUT_FILE_EXT):
-                    #        files.append(abspath)
-            for filename in files:
-                # replacing format name
-                out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
+            if os.path.isdir(abspath):
+                files.extend(walk_dir(abspath))
 
-                print('Importing', os.path.basename(filename))
+                for filename in files:
+                    # replacing format name
+                    out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
 
-                out = sys.stdout
+                    #print('\tImporting', colored(os.path.basename(filename), 'yellow'))
 
-                sourcePath = "models" + filename.split("models", 1)[1] # HACK?
-                mdl_path = fix_path(sourcePath)
+                    out = sys.stdout
+
+                    sourcePath = "models" + filename.split("models", 1)[1] # HACK?
+                    mdl_path = fix_path(sourcePath)
     
-                with open(out_name, 'w') as out:
-                    putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
+                    with open(out_name, 'w') as out:
+                        putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
 
-        print(colored('Converting "' + i + '" was successful!', 'green'))
+        print(colored('\tConverting completed!', 'green'))
     
     pass
 
@@ -118,7 +120,7 @@ def convert_multiple_main():
 
     # if file exists
     if (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME)):
-        paths = convert_multiple_valid_path_check()
+        paths = convert_multiple_get_valid_paths()
 
         if (bool(paths) != False):
             #print all valid paths
@@ -155,15 +157,11 @@ def convert_once_main():
     
             if os.path.isdir(abspath):
                 files.extend(walk_dir(abspath))
-                    #else:
-                    #    if abspath.lower().endswith(INPUT_FILE_EXT):
-                    #        files.append(abspath)
 
             for filename in files:
                 out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
-                #if os.path.exists(out_name): continue
 
-                print('Importing', os.path.basename(filename))
+                print('\tImporting', colored(os.path.basename(filename), 'yellow'))
 
                 out = sys.stdout
 
@@ -173,7 +171,7 @@ def convert_once_main():
                 with open(out_name, 'w') as out:
                     putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
         
-            print(colored('\nConverting "' + abspath + '" was successful!', 'green'))
+            print(colored('\tConverting completed!', 'green'))
         
         finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
   
@@ -181,7 +179,7 @@ def convert_once_main():
 
 print('\nSource 2 VMDL Generator! By Rectus via Github.')
 print("Initially forked by Alpine, based on caseytube's fork, this version by 5FB5.")
-print("Version: 1.1.1")
+print("Version: 1.1.2")
 print('--------------------------------------------------------------------------------------------------------')
 print('Reminder to put your models in the same directory structure as Source 1, starting with models!\n')
 
@@ -190,15 +188,14 @@ files = []
 
 # Warning message if we haven't file
 if (not os.path.isfile(FILE_MULTIPLE_CONVERT_NAME)):
-    warningMsg = colored(FILE_MULTIPLE_CONVERT_NAME + ' file for multiple converting not found.\n', 'yellow')
+    warningMsg = FILE_MULTIPLE_CONVERT_NAME + ' file for multiple converting ' + colored('not founded!\n', 'yellow')
     print(warningMsg)
 else:
-    validMsg = colored(FILE_MULTIPLE_CONVERT_NAME + ' file for multiple converting detected!', 'green')
+    validMsg = FILE_MULTIPLE_CONVERT_NAME + ' file for multiple converting ' + colored('detected!\n', 'green')
     print(validMsg)
 
 # Main function
 while (True):
-
     startupMsg = input('\nDo you want to convert multiple files automatically ("a") or specific one manually ("m") or quit ("q")? \na/m/q: ')
 
     if (startupMsg == 'a'):
