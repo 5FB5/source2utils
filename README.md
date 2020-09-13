@@ -79,6 +79,7 @@ In the interm, if you'd like to add an unsupported shader to the script, just do
 
 ## System Requirements (for running the Python Scripts):
 Python 3.7 or later
+  * Libraries: tqdm, colorama, termcolor
 
 [Python Image Library (PIL)  5.4.1](https://pillow.readthedocs.io/en/5.1.x/installation.html)
 
