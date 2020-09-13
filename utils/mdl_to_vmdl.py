@@ -3,6 +3,7 @@
 
 import re, sys, os, io, re
 
+from sys import platform
 from tqdm import tqdm
 from colorama import init
 from termcolor import colored, cprint
@@ -68,7 +69,7 @@ def convert_multiple_get_valid_paths():
         # open file and read all in buffer
         buff_paths = [row.rstrip() for row in file_src]
         
-    for i in buff_paths:
+    for i in buff_paths: #TODO: add Linux path format
         # check valid paths
         path_index = re.findall(r'^[a-zA-Z]:[\\\S|*\S]?.*$', i) 
         
@@ -92,7 +93,7 @@ def convert_multiple_generate_vmdl(paths_array):
         abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
         print('\nConverting "' + abspath + '"')
         
-        for j in tqdm(range(len(_paths))):
+        for j in tqdm(range(len(_paths))): # activate progress bar
     
             if os.path.isdir(abspath):
                 files.extend(walk_dir(abspath))
@@ -100,8 +101,6 @@ def convert_multiple_generate_vmdl(paths_array):
                 for filename in files:
                     # replacing format name
                     out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
-
-                    #print('\tImporting', colored(os.path.basename(filename), 'yellow'))
 
                     out = sys.stdout
 
@@ -119,7 +118,7 @@ def convert_multiple_main():
     paths = []
 
     # if file exists
-    if (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME)):
+    if (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME) and platform == "win32"):
         paths = convert_multiple_get_valid_paths()
 
         if (bool(paths) != False):
@@ -134,6 +133,20 @@ def convert_multiple_main():
         else:
             invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\', 'green')
             print(invalidMsg)
+    elif (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME) and (platform == "linux" or platform == "linux2")):
+        paths = convert_multiple_get_valid_paths()
+
+        if (bool(paths) != False):
+            #print all valid paths
+            print("\nValid paths:")
+            for i in paths:
+                print(colored('+ ' + i, 'green'))
+            print('--------------------------------------------------------------------------------------------------------')
+            
+            convert_multiple_generate_vmdl(paths)
+        else:
+            invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('[LINUX PATH EXAMPLE]', 'green')
+            print(invalidMsg)  
 
     else:
         textInvalid = colored(FILE_MULTIPLE_CONVERT_NAME + ' not found! Add ' + FILE_MULTIPLE_CONVERT_NAME + ' file and fill it with some of the paths you need.', 'red')
@@ -141,16 +154,26 @@ def convert_multiple_main():
         
     pass
 
+#TODO: Enter Linux path
 def convert_once_main():
     finalCommand = ''
 
     while (not finalCommand == 'n'):
-        PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? Valid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ").lower()
+        #If Linux
+        if (platform == "linux" or platform == "linux2"):
+            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? Valid path format example [LINUX PATH FORMAT] \nPath: ").lower()
+        else: # If Windows
+            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? Valid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ").lower()
     
-        if (not os.path.exists(PATH_TO_CONTENT_ROOT)):
+        # If Windows have invalid path
+        if (not os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
             textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example:', 'red') + colored(' C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \n', 'green')
             print(textInvalid)
-        else:
+
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+
+        # If Windows have valid path
+        elif (os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
             # recursively search all dirs and files
             abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
             print('\nConverting "' + abspath + '"')
@@ -171,11 +194,44 @@ def convert_once_main():
                     mdl_path = fix_path(sourcePath)
     
                     with open(out_name, 'w') as out:
-                        putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
-        
+                        putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))   
             print(colored('\tConverting completed!', 'green'))
         
-        finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+
+        # If Linux have invalid path
+        if (not os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
+            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check Linux path format.', 'red')
+            print(textInvalid)
+
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+
+        # If Linux have valid path
+        elif (os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
+            # recursively search all dirs and files
+            abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
+            print('\nConverting "' + abspath + '"')
+    
+            if os.path.isdir(abspath):
+                files.extend(walk_dir(abspath))
+
+            for i in tqdm(range(len(files))):
+
+                for filename in files:
+                    out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
+
+                    #print('\tImporting', colored(os.path.basename(filename), 'yellow'))
+
+                    out = sys.stdout
+
+                    sourcePath = "models" + filename.split("models", 1)[1] # HACK?
+                    mdl_path = fix_path(sourcePath)
+    
+                    with open(out_name, 'w') as out:
+                        putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))   
+            print(colored('\tConverting completed!', 'green'))
+        
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
   
     pass
 
