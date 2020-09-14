@@ -69,10 +69,15 @@ def convert_multiple_get_valid_paths():
         # open file and read all in buffer
         buff_paths = [row.rstrip() for row in file_src]
         
-    for i in buff_paths: #TODO: add Linux path format
-        # check valid paths
-        path_index = re.findall(r'^[a-zA-Z]:[\\\S|*\S]?.*$', i) 
+    for i in buff_paths: #TODO: add Linux path format 
+        # check windows style paths
+        if (platform == "win32"):
+            path_index = re.findall(r'^[a-zA-Z]:[\\\S|*\S]?.*$', i) 
         
+        #check linux style paths
+        elif (platform == "linux" or platform == "linux2"):
+            path_index = re.findall(r'/*.*$', i)
+
         if (bool(path_index) != False):
             for j in path_index:
                 # right paths we write in filtered list
@@ -237,7 +242,7 @@ def convert_once_main():
 
 print('\nSource 2 VMDL Generator! By Rectus via Github.')
 print("Initially forked by Alpine, based on caseytube's fork, this version by 5FB5.")
-print("Version: 1.1.2")
+print("Version: 1.2.0")
 print('--------------------------------------------------------------------------------------------------------')
 print('Reminder to put your models in the same directory structure as Source 1, starting with models!\n')
 
