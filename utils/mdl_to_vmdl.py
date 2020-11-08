@@ -3,9 +3,10 @@
 
 import re, sys, os, io, re
 
+from sys import platform
 from tqdm import tqdm
-from colorama import init
 from termcolor import colored, cprint
+from colorama import init
 
 init()
 
@@ -69,9 +70,14 @@ def convert_multiple_get_valid_paths():
         buff_paths = [row.rstrip() for row in file_src]
         
     for i in buff_paths:
-        # check valid paths
-        path_index = re.findall(r'^[a-zA-Z]:[\\\S|*\S]?.*$', i) 
+        # check windows style paths
+        if (platform == "win32"):
+            path_index = re.findall(r'^[a-zA-Z]:[\\\S|*\S]?.*$', i) # for once converting ^[a-zA-Z]:[\\\S|*\S]?.*?[.]mdl$
         
+        #check linux style paths
+        elif (platform == "linux" or platform == "linux2"):
+            path_index = re.findall(r'^(?:/[^/\n]+)*$', i) # check if it works, for once converting ^(?:/[^/\n]+)*[.]mdl$
+
         if (bool(path_index) != False):
             for j in path_index:
                 # right paths we write in filtered list
@@ -79,7 +85,6 @@ def convert_multiple_get_valid_paths():
                     paths_filtered.append(j)
     
     return(paths_filtered)
-
 
 def convert_multiple_generate_vmdl(paths_array):
     _paths = paths_array
@@ -92,7 +97,7 @@ def convert_multiple_generate_vmdl(paths_array):
         abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
         print('\nConverting "' + abspath + '"')
         
-        for j in tqdm(range(len(_paths))):
+        for j in tqdm(range(len(_paths))): # activate progress bar
     
             if os.path.isdir(abspath):
                 files.extend(walk_dir(abspath))
@@ -101,11 +106,9 @@ def convert_multiple_generate_vmdl(paths_array):
                     # replacing format name
                     out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
 
-                    #print('\tImporting', colored(os.path.basename(filename), 'yellow'))
-
                     out = sys.stdout
 
-                    sourcePath = "models" + filename.split("models", 1)[1] # HACK?
+                    sourcePath = "models" + filename.split("models", 1)[1]
                     mdl_path = fix_path(sourcePath)
     
                     with open(out_name, 'w') as out:
@@ -119,11 +122,11 @@ def convert_multiple_main():
     paths = []
 
     # if file exists
-    if (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME)):
+    if (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME) and platform == "win32"):
         paths = convert_multiple_get_valid_paths()
 
         if (bool(paths) != False):
-            #print all valid paths
+            #print all valid Windows paths
             print("\nValid paths:")
             for i in paths:
                 print(colored('+ ' + i, 'green'))
@@ -134,6 +137,21 @@ def convert_multiple_main():
         else:
             invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\', 'green')
             print(invalidMsg)
+    
+    elif (os.path.isfile(FILE_MULTIPLE_CONVERT_NAME) and (platform == "linux" or platform == "linux2")):
+        paths = convert_multiple_get_valid_paths()
+
+        if (bool(paths) != False):
+            #print all valid Linux paths
+            print("\nValid paths:")
+            for i in paths:
+                print(colored('+ ' + i, 'green'))
+            print('--------------------------------------------------------------------------------------------------------')
+            
+            convert_multiple_generate_vmdl(paths)
+        else:
+            invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('/path/to/file.mdl or /home/user/path/to/file.mdl', 'green')
+            print(invalidMsg)  
 
     else:
         textInvalid = colored(FILE_MULTIPLE_CONVERT_NAME + ' not found! Add ' + FILE_MULTIPLE_CONVERT_NAME + ' file and fill it with some of the paths you need.', 'red')
@@ -141,47 +159,75 @@ def convert_multiple_main():
         
     pass
 
+def convert_once_generate_vmdl(path):
+    # recursively search all dirs and files
+    abspath = os.path.abspath(path)
+    print('\nConverting "' + abspath + '"')
+    
+    if os.path.isdir(abspath):
+        files.extend(walk_dir(abspath))
+
+    for i in tqdm(range(len(path))):
+        for filename in files:
+            out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
+
+            out = sys.stdout
+
+            sourcePath = "models" + filename.split("models", 1)[1] # HACK?
+            mdl_path = fix_path(sourcePath)
+    
+            with open(out_name, 'w') as out:
+                putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))   
+            
+    print(colored('\tConverting completed!', 'green'))     
+    
+    pass
+
 def convert_once_main():
     finalCommand = ''
 
     while (not finalCommand == 'n'):
-        PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? Valid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ").lower()
+        #Enter path and check for valid
+        # If Linux
+        if (platform == "linux" or platform == "linux2"):
+            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: /path/to/file or /home/user/path/to/file \nPath: ")
+        else: # If Windows
+            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ")
     
-        if (not os.path.exists(PATH_TO_CONTENT_ROOT)):
+        # MAIN CONVERT PROCESS
+        # Windows
+        # If valid path
+        if (os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
+            convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
+        
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+        
+        # If invalid path
+        elif (not os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
             textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example:', 'red') + colored(' C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \n', 'green')
             print(textInvalid)
-        else:
-            # recursively search all dirs and files
-            abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
-            print('\nConverting "' + abspath + '"')
-    
-            if os.path.isdir(abspath):
-                files.extend(walk_dir(abspath))
 
-            for i in tqdm(range(len(files))):
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
 
-                for filename in files:
-                    out_name = filename.replace(INPUT_FILE_EXT, OUTPUT_FILE_EXT)
-
-                    #print('\tImporting', colored(os.path.basename(filename), 'yellow'))
-
-                    out = sys.stdout
-
-                    sourcePath = "models" + filename.split("models", 1)[1] # HACK?
-                    mdl_path = fix_path(sourcePath)
-    
-                    with open(out_name, 'w') as out:
-                        putl(out, VMDL_BASE.replace('<mdl>', mdl_path).replace((' ' * 4), '\t'))
+        # Linux
+        # If valid path
+        if (os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
+            convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
         
-            print(colored('\tConverting completed!', 'green'))
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
         
-        finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+        # If invalid path
+        elif (not os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
+            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example', 'red')
+            print(textInvalid)
+
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
   
     pass
 
 print('\nSource 2 VMDL Generator! By Rectus via Github.')
 print("Initially forked by Alpine, based on caseytube's fork, this version by 5FB5.")
-print("Version: 1.1.2")
+print("Version: 1.2.0")
 print('--------------------------------------------------------------------------------------------------------')
 print('Reminder to put your models in the same directory structure as Source 1, starting with models!\n')
 
