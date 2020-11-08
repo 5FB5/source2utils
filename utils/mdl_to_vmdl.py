@@ -97,7 +97,7 @@ def convert_multiple_generate_vmdl(paths_array):
         abspath = os.path.abspath(PATH_TO_CONTENT_ROOT)
         print('\nConverting "' + abspath + '"')
         
-        for j in tqdm(range(len(_paths))): # activate progress bar FIXME: not working on Linux (I don't know why this shit not works)
+        for j in tqdm(range(len(_paths))): # activate progress bar
     
             if os.path.isdir(abspath):
                 files.extend(walk_dir(abspath))
@@ -183,7 +183,6 @@ def convert_once_generate_vmdl(path):
     
     pass
 
-#TODO: Enter Linux path
 def convert_once_main():
     finalCommand = ''
 
@@ -191,37 +190,37 @@ def convert_once_main():
         #Enter path and check for valid
         # If Linux
         if (platform == "linux" or platform == "linux2"):
-            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: /path/to/file.mdl or /home/user/path/to/file.mdl \nPath: ").lower()
+            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: /path/to/file or /home/user/path/to/file \nPath: ")
         else: # If Windows
-            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ").lower()
+            PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ")
     
         # MAIN CONVERT PROCESS
         # Windows
+        # If valid path
+        if (os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
+            convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
+        
+            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
+        
         # If invalid path
-        if (not os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
+        elif (not os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
             textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example:', 'red') + colored(' C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \n', 'green')
             print(textInvalid)
 
             finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
 
+        # Linux
         # If valid path
-        elif (os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
+        if (os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
             convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
         
             finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
-
-        # Linux
+        
         # If invalid path
-        if (not os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
-            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check Linux path format.', 'red')
+        elif (not os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
+            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example', 'red')
             print(textInvalid)
 
-            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
-
-        # If valid path
-        elif (os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
-            convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
-        
             finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
   
     pass
