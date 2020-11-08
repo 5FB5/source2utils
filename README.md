@@ -21,11 +21,9 @@ Below is a list of branches that DON'T work with this tool (with the HL:A Bootle
 ## Installation Instructions
 1. Go to the Releases Tab on the top right of this page
 
-2. Download the latest release and extract to anywhere.
+2. Download the latest release and extract tool you need to anywhere.
 
-3. Download and set up the [Half-Life Alyx Bootleg Tools](https://github.com/thenayr/Half-Life-Alyx-SDK)
-
-4. Run the scripts or .exe program as instructed below.
+3. Run the scripts or .exe program as instructed below.
 
 ## vmt_to_vmat.py
 
