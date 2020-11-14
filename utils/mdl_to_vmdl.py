@@ -76,7 +76,7 @@ def convert_multiple_get_valid_paths():
         
         #check linux style paths
         elif (platform == "linux" or platform == "linux2"):
-            path_index = re.findall(r'^(?:/[^/\n]+)*$', i) # check if it works, for once converting ^(?:/[^/\n]+)*[.]mdl$
+            path_index = re.findall(r'^(?:/[^/\n]+)*$', i) # for once converting ^(?:/[^/\n]+)*[.]mdl$
 
         if (bool(path_index) != False):
             for j in path_index:
@@ -150,7 +150,7 @@ def convert_multiple_main():
             
             convert_multiple_generate_vmdl(paths)
         else:
-            invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('/path/to/file.mdl or /home/user/path/to/file.mdl', 'green')
+            invalidMsg = colored('Valid paths not found! Check your paths with example: ', 'red') + colored('/path/to/file.mdl or /home/user/path/to/file', 'green')
             print(invalidMsg)  
 
     else:
@@ -191,15 +191,15 @@ def convert_once_main():
         # If Linux
         if (platform == "linux" or platform == "linux2"):
             PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: /path/to/file or /home/user/path/to/file \nPath: ")
-        else: # If Windows
+        
+        # If Windows
+        elif (platform == "win32"):
             PATH_TO_CONTENT_ROOT = input("\nWhat folder would you like to convert? \nValid path format example: C:\\Steam\\steamapps\\Half-Life Alyx\\content\\tf\\models\\props_spytech\\ \nPath: ")
     
         # MAIN CONVERT PROCESS
-        # Windows
         # If valid path
-        if (os.path.exists(PATH_TO_CONTENT_ROOT) and platform == "win32"):
+        if (os.path.exists(PATH_TO_CONTENT_ROOT)):
             convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
-        
             finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
         
         # If invalid path
@@ -209,16 +209,8 @@ def convert_once_main():
 
             finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
 
-        # Linux
-        # If valid path
-        if (os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
-            convert_once_generate_vmdl(PATH_TO_CONTENT_ROOT)
-        
-            finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
-        
-        # If invalid path
         elif (not os.path.exists(PATH_TO_CONTENT_ROOT) and (platform == "linux" or platform == "linux2")):
-            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example', 'red')
+            textInvalid = colored('Path "' + PATH_TO_CONTENT_ROOT + '" is invalid! Check path with valid format example: ', 'red') + colored('/path/to/file or /home/user/path/to/file \n', 'green')
             print(textInvalid)
 
             finalCommand = input('\nDo you want to continue? "n" - back. \ny/n: ')
