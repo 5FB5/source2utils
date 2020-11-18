@@ -2,7 +2,7 @@
 
 # source2utils
 
-This is a 3rd generation fork, first created by Rectus and then Forked by DankParrot/Alpyne and Caseytube. These are a set of scripts to help convert Source 1 assets to Source 2 with ease, partly using the tools Valve already have available, and using a materials script that takes a lot of guesswork. These tools were intended to be used with the Source 2 Filmmaker, but can be applied to any Source 2 project.
+This is a 4rd generation fork, first created by Rectus and then Forked by DankParrot/Alpyne, Caseytube and 5FB5. These are a set of scripts to help convert Source 1 assets to Source 2 with ease, partly using the tools Valve already have available, and using a materials script that takes a lot of guesswork. These tools were intended to be used with the Source 2 Filmmaker, but can be applied to any Source 2 project.
 
 ![screenie-1](https://i.imgur.com/XvADzGe.jpg)
 ![screenie-2](https://i.imgur.com/yYJu0fI.jpg)
@@ -21,11 +21,9 @@ Below is a list of branches that DON'T work with this tool (with the HL:A Bootle
 ## Installation Instructions
 1. Go to the Releases Tab on the top right of this page
 
-2. Download the latest release and extract to anywhere.
+2. Download the latest release and extract tool you need to anywhere.
 
-3. Download and set up the [Half-Life Alyx Bootleg Tools](https://github.com/thenayr/Half-Life-Alyx-SDK)
-
-4. Run the scripts as instructed below.
+3. Run the scripts or .exe program as instructed below.
 
 ## vmt_to_vmat.py
 
